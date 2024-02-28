@@ -10,63 +10,54 @@ def main():
     # Gets file name from cli
     file_name = sys.argv[1]
 
-    # Returns list of ops
-    open_file(file_name)
-
     # Init the boi
-    x = ALU()
+    my_hw = ALU()
 
-    # Run the code
+    # Run list of ops
+    my_rules = fCalls()
+    my_rules.init(my_hw)
+    exec_file(file_name, my_rules)
 
     # Return display info if it worked
-    x.print_tables
-    # x.display
+    my_hw.print_tables
+    # my_hw.display
 
 
-def open_file(file_name):
-    # Open the file with read perms
-    file = open(file_name, "r")
-    Lines = file.readlines()
+# Some defs for images, Just change the O's to G or R to make LEDs light up
+def check_mark():
+    G = (0, 255, 0)
+    O = (0, 0, 0)
 
-    for line in Lines:
-        # Split up line based on whitespace
-        split_line = line.split(" ")
+    # img = [
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # ]
 
-        # Sanitize commas and /n
-        for val in range(len(split_line)):
-            split_line[val] = split_line[val].replace(",", "")
-            split_line[val] = split_line[val].replace("\n", "")
-
-        # Get function
-        match split_line[0]:
-            case "MOVE":
-                print("move")
-            case "LOAD":
-                print("load")
-            case "STORE":
-                print("store")
-            case "ADD":
-                print("add")
-            case "SUBTRACT":
-                print("sub")
-            case "MULTIPLY":
-                print("mul")
-            case "DIVIDE":
-                print("div")
+    # return img
 
 
-# Thei represents the instruction set
-class fCall:
-    class func(Enum):
-        MOVE = 0
-        LOAD = 1
-        STORE = 2
-        ADD = 3
-        SUBTRACT = 4
-        MULTIPLY = 5
-        DIVIDE = 6
+def red_x():
+    R = (255, 0, 0)
+    O = (0, 0, 0)
 
-    def MOVE(ALU):
+    # img = [
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # O, O, O, O, O, O, O, O,
+    # ]
+
+    # return img
 
 
 # This represents the "raw hardware"
@@ -74,12 +65,6 @@ class ALU:
     # The actual arrays for memory
     regs = [0] * 5
     data = [0] * 10
-
-    # This handles any registers we may have to work with
-    r1 = 0
-    r2 = 0
-    r3 = 0
-    d = 0
 
     # Bool for if there was an error
     has_error = False
@@ -129,41 +114,65 @@ class ALU:
     #         s.set_pixels(check_mark)
 
 
-# Some defs for images, Just change the O's to G or R to make LEDs light up
-def check_mark():
-    G = (0, 255, 0)
-    O = (0, 0, 0)
+# These represent the instruction set
+class fCalls:
+    # This is the hardware
+    hw = ALU
 
-    # img = [
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # ]
+    def init(self, ALU):
+        self.hw = ALU
+        return
 
-    # return img
+    # The actual function defs
+    def MOVE(self, r, i):
+        return
+
+    def LOAD(self, r, d):
+        return
+
+    def STORE(self):
+        return
+
+    def ADD(self):
+        return
 
 
-def red_x():
-    R = (255, 0, 0)
-    O = (0, 0, 0)
+def exec_file(file_name: str, f: fCalls):
+    # Open the file with read perms
+    file = open(file_name, "r")
+    Lines = file.readlines()
 
-    # img = [
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # ]
+    for line in Lines:
+        # Split up line based on whitespace
+        split_line = line.split(" ")
 
-    # return img
+        # Sanitize commas and /n
+        for val in range(len(split_line)):
+            split_line[val] = split_line[val].replace(",", "")
+            split_line[val] = split_line[val].replace("\n", "")
+
+        # Get function
+        match split_line[0]:
+            case "MOVE":
+                f.MOVE(int(split_line[1]), int(split_line[2]))
+            case "LOAD":
+                f.LOAD(int(split_line[1]), int(split_line[2]))
+            case "STORE":
+                print("store")
+            case "ADD":
+                print("add")
+            case "SUBTRACT":
+                print("sub")
+            case "MULTIPLY":
+                print("mul")
+            case "DIVIDE":
+                print("div")
+            case _:
+                # Return flase if invalid instruction is passed
+                return False
+
+        # Return true on success
+        return True
 
 
 # Run main
