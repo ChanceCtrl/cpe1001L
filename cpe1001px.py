@@ -5,6 +5,10 @@ from enum import Enum
 # Pi sense hat import
 # from sense_hat import SenseHat
 
+# TODO: Finish the LED color guy
+# TODO: Finish substract, multiply, divide ops
+# TODO: Test
+
 
 def main():
     # Gets file name from cli
@@ -13,14 +17,15 @@ def main():
     # Init the boi
     my_hw = ALU()
 
-    # Run list of ops
-    my_rules = fCalls()
+    try:
+        ops = load_file(file_name)
 
-    if load_file(file_name, my_rules):
-        # Return display info if it worked
+        # Return display info if everything worked
         my_hw.print_tables
-    else:
+
+    except:
         # Display that there was an error loading the file
+        print("Failed")
         my_hw.has_error = True
         # my_hw.display
 
@@ -116,28 +121,17 @@ class ALU:
     #         s.set_pixels(check_mark)
 
 
-# These represent the instruction set
-class fCalls:
-    # The actual function defs
-    def MOVE(self, rx, i):
-        print(rx)
-        print(i)
-        return
-
-    def LOAD(self, rx, ry):
-        return
-
-    def STORE(self, rx, dv):
-        return
-
-    def ADD(self, rx, ry, rz):
-        return
-
-    def SUBTRACT(self, rx, ry, rz):
-        return
+# These represent the instruction set, add some more here
+class fCalls(Enum):
+    # A value to associate with text
+    MOVE = 0
+    LOAD = 1
+    STORE = 2
+    ADD = 3
+    SUBTRACT = 4
 
 
-def load_file(file_name: str, f: fCalls):
+def load_file(file_name: str):
     # Open the file with read perms
     file = open(file_name, "r")
     Lines = file.readlines()
@@ -163,27 +157,39 @@ def load_file(file_name: str, f: fCalls):
                 # Append to list
                 ops.append([fCalls.MOVE, int(rx), int(split_line[2])])
             case "LOAD":
+                # Sanitize
                 rx = split_line[1].replace("R", "")
-                split_line[2].replace("R", "")
-                split_line[2].replace("[", "")
-                split_line[2].replace("]", "")
-                ops.append([fCalls.LOAD, int(split_line[1]), int(split_line[2])])
+                ry = split_line[2].replace("R", "")
+                ry = ry.replace("[", "")
+                ry = ry.replace("]", "")
+
+                # Append to list
+                ops.append([fCalls.LOAD, int(rx), int(ry)])
             case "STORE":
-                print("store")
+                rx = split_line[1].replace("R", "")
+                dy = split_line[2].replace("D", "")
+                dy = dy.replace("[", "")
+                dy = dy.replace("]", "")
+
+                # Append to list
+                ops.append([fCalls.STORE, int(rx), int(dy)])
             case "ADD":
-                print("add")
+                ops.append([])
             case "SUBTRACT":
-                print("sub")
+                ops.append([])
             case "MULTIPLY":
-                print("mul")
+                ops.append([])
             case "DIVIDE":
-                print("div")
+                ops.append([])
+
             case _:
                 # Return flase if invalid instruction is passed
                 return False
 
-        # Return true on success
-        return
+        print(ops)
+
+    # Return Ops on success
+    return ops
 
 
 # Run main
