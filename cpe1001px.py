@@ -10,24 +10,14 @@ from enum import Enum
 # TODO: Test
 
 
-def main():
-    # Gets file name from cli
-    file_name = sys.argv[1]
-
-    # Init the boi
-    my_hw = ALU()
-
-    try:
-        ops = load_file(file_name)
-
-        # Return display info if everything worked
-        my_hw.print_tables
-
-    except:
-        # Display that there was an error loading the file
-        print("Failed")
-        my_hw.has_error = True
-        # my_hw.display
+# These represent the instruction set, add some more here
+class fCalls(Enum):
+    # A value to associate with text
+    MOVE = 0
+    LOAD = 1
+    STORE = 2
+    ADD = 3
+    SUBTRACT = 4
 
 
 # Some defs for images, Just change the O's to G or R to make LEDs light up
@@ -65,6 +55,41 @@ def red_x():
     # ]
 
     # return img
+
+
+def main():
+    # Gets file name from cli
+    file_name = sys.argv[1]
+
+    # Init the boi
+    my_hw = ALU()
+
+    ops = load_file(file_name)
+
+    if not ops:
+        # Display that there was an error loading the file
+        print("Failed")
+        my_hw.has_error = True
+        # my_hw.display
+    else:
+        print(ops)
+        for op in ops:
+            match op[0]:
+                case fCalls.MOVE:
+                    # Set register equal to int
+                    my_hw.regs[op[1]] = op[2]
+                case fCalls.LOAD:
+                    # Load from memory into reg
+                    my_hw.regs[op[1]] = my_hw.data[op[2]]
+                case fCalls.STORE:
+                    # Store reg into memory
+                    my_hw.data[op[2]] = my_hw.regs[op[1]]
+                case fCalls.ADD:
+                    # Add two regs together into another reg
+                    my_hw.regs[op[3]] = my_hw.regs[op[1]] + my_hw.regs[op[2]]
+
+    # Return display info if everything
+    my_hw.print_tables()
 
 
 # This represents the "raw hardware"
@@ -121,20 +146,13 @@ class ALU:
     #         s.set_pixels(check_mark)
 
 
-# These represent the instruction set, add some more here
-class fCalls(Enum):
-    # A value to associate with text
-    MOVE = 0
-    LOAD = 1
-    STORE = 2
-    ADD = 3
-    SUBTRACT = 4
-
-
 def load_file(file_name: str):
     # Open the file with read perms
     file = open(file_name, "r")
     Lines = file.readlines()
+
+    # Make a list of ops
+    ops = []
 
     for line in Lines:
         # Split up line based on whitespace
@@ -144,9 +162,6 @@ def load_file(file_name: str):
         for val in range(len(split_line)):
             split_line[val] = split_line[val].replace(",", "")
             split_line[val] = split_line[val].replace("\n", "")
-
-        # Make a list of ops
-        ops = []
 
         # Get function
         match split_line[0]:
@@ -174,7 +189,10 @@ def load_file(file_name: str):
                 # Append to list
                 ops.append([fCalls.STORE, int(rx), int(dy)])
             case "ADD":
-                ops.append([])
+                rx = split_line[1].replace("R", "")
+                ry = split_line[2].replace("R", "")
+                rz = split_line[3].replace("R", "")
+                ops.append([fCalls.ADD, int(rx), int(ry), int(rz)])
             case "SUBTRACT":
                 ops.append([])
             case "MULTIPLY":
@@ -185,8 +203,6 @@ def load_file(file_name: str):
             case _:
                 # Return flase if invalid instruction is passed
                 return False
-
-        print(ops)
 
     # Return Ops on success
     return ops
