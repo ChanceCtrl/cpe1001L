@@ -14,12 +14,12 @@ def main():
     open_file(file_name)
 
     # Init the boi
-    x = fCall
-    x.print_tables
+    x = ALU()
 
     # Run the code
 
     # Return display info if it worked
+    x.print_tables
     # x.display
 
 
@@ -32,22 +32,48 @@ def open_file(file_name):
         # Split up line based on whitespace
         split_line = line.split(" ")
 
-        # Remove any commas
-        for val in split_line:
-            val = val.replace(",", "")
+        # Sanitize commas and /n
+        for val in range(len(split_line)):
+            split_line[val] = split_line[val].replace(",", "")
+            split_line[val] = split_line[val].replace("\n", "")
+
+        # Get function
+        match split_line[0]:
+            case "MOVE":
+                print("move")
+            case "LOAD":
+                print("load")
+            case "STORE":
+                print("store")
+            case "ADD":
+                print("add")
+            case "SUBTRACT":
+                print("sub")
+            case "MULTIPLY":
+                print("mul")
+            case "DIVIDE":
+                print("div")
 
 
+# Thei represents the instruction set
 class fCall:
-    # The actual arrays for memory
-    regs = [0] * 5
-    data = [0] * 10
-
-    # Add more functions here
-    class call(Enum):
+    class func(Enum):
         MOVE = 0
         LOAD = 1
         STORE = 2
         ADD = 3
+        SUBTRACT = 4
+        MULTIPLY = 5
+        DIVIDE = 6
+
+    def MOVE(ALU):
+
+
+# This represents the "raw hardware"
+class ALU:
+    # The actual arrays for memory
+    regs = [0] * 5
+    data = [0] * 10
 
     # This handles any registers we may have to work with
     r1 = 0
@@ -90,6 +116,7 @@ class fCall:
 
         # Return table
         print(m)
+        return
 
     # def display(self):
     #     # Init sense hat
