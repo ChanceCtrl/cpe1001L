@@ -3,11 +3,7 @@ import sys
 from enum import Enum
 
 # Pi sense hat import
-# from sense_hat import SenseHat
-
-# TODO: Finish the LED color guy
-# TODO: Finish substract, multiply, divide ops
-# TODO: Test
+from sense_hat import SenseHat
 
 
 # These represent the instruction set, add some more here
@@ -18,43 +14,23 @@ class fCalls(Enum):
     STORE = 2
     ADD = 3
     SUBTRACT = 4
+    MULTIPLY = 5
+    DIVIDE = 6
 
 
 # Some defs for images, Just change the O's to G or R to make LEDs light up
 def check_mark():
     G = (0, 255, 0)
-    O = (0, 0, 0)
+    img = [G] * 64
 
-    # img = [
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # ]
-
-    # return img
+    return img
 
 
 def red_x():
     R = (255, 0, 0)
-    O = (0, 0, 0)
+    img = [R] * 64
 
-    # img = [
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # O, O, O, O, O, O, O, O,
-    # ]
-
-    # return img
+    return img
 
 
 def main():
@@ -68,11 +44,9 @@ def main():
 
     if not ops:
         # Display that there was an error loading the file
-        print("Failed")
         my_hw.has_error = True
-        # my_hw.display
+        my_hw.display
     else:
-        print(ops)
         for op in ops:
             match op[0]:
                 case fCalls.MOVE:
@@ -87,9 +61,16 @@ def main():
                 case fCalls.ADD:
                     # Add two regs together into another reg
                     my_hw.regs[op[3]] = my_hw.regs[op[1]] + my_hw.regs[op[2]]
+                case fCalls.SUBTRACT:
+                    my_hw.regs[op[3]] = my_hw.regs[op[1]] - my_hw.regs[op[2]]
+                case fCalls.MULTIPLY:
+                    my_hw.regs[op[3]] = int(my_hw.regs[op[1]] * my_hw.regs[op[2]])
+                case fCalls.DIVIDE:
+                    my_hw.regs[op[3]] = int(my_hw.regs[op[1]] / my_hw.regs[op[2]])
 
-    # Return display info if everything
-    my_hw.print_tables()
+        # Return display info if everything
+        my_hw.print_tables()
+        my_hw.display
 
 
 # This represents the "raw hardware"
@@ -135,15 +116,15 @@ class ALU:
         print(m)
         return
 
-    # def display(self):
-    #     # Init sense hat
-    #     s = SenseHat()
-    #     s.low_light = True
-    #
-    #     if self.has_error:
-    #         s.set_pixels(red_x)
-    #     else:
-    #         s.set_pixels(check_mark)
+    def display(self):
+        # Init sense hat
+        s = SenseHat()
+        s.low_light = True
+
+        if self.has_error:
+            s.set_pixels(red_x)
+        else:
+            s.set_pixels(check_mark)
 
 
 def load_file(file_name: str):
@@ -194,11 +175,20 @@ def load_file(file_name: str):
                 rz = split_line[3].replace("R", "")
                 ops.append([fCalls.ADD, int(rx), int(ry), int(rz)])
             case "SUBTRACT":
-                ops.append([])
+                rx = split_line[1].replace("R", "")
+                ry = split_line[2].replace("R", "")
+                rz = split_line[3].replace("R", "")
+                ops.append([fCalls.SUBTRACT, int(rx), int(ry), int(rz)])
             case "MULTIPLY":
-                ops.append([])
+                rx = split_line[1].replace("R", "")
+                ry = split_line[2].replace("R", "")
+                rz = split_line[3].replace("R", "")
+                ops.append([fCalls.MULTIPLY, int(rx), int(ry), int(rz)])
             case "DIVIDE":
-                ops.append([])
+                rx = split_line[1].replace("R", "")
+                ry = split_line[2].replace("R", "")
+                rz = split_line[3].replace("R", "")
+                ops.append([fCalls.DIVIDE, int(rx), int(ry), int(rz)])
 
             case _:
                 # Return flase if invalid instruction is passed
