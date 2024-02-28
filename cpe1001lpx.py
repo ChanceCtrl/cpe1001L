@@ -15,12 +15,14 @@ def main():
 
     # Run list of ops
     my_rules = fCalls()
-    my_rules.init(my_hw)
-    exec_file(file_name, my_rules)
 
-    # Return display info if it worked
-    my_hw.print_tables
-    # my_hw.display
+    if load_file(file_name, my_rules):
+        # Return display info if it worked
+        my_hw.print_tables
+    else:
+        # Display that there was an error loading the file
+        my_hw.has_error = True
+        # my_hw.display
 
 
 # Some defs for images, Just change the O's to G or R to make LEDs light up
@@ -116,28 +118,26 @@ class ALU:
 
 # These represent the instruction set
 class fCalls:
-    # This is the hardware
-    hw = ALU
-
-    def init(self, ALU):
-        self.hw = ALU
-        return
-
     # The actual function defs
-    def MOVE(self, r, i):
+    def MOVE(self, rx, i):
+        print(rx)
+        print(i)
         return
 
-    def LOAD(self, r, d):
+    def LOAD(self, rx, ry):
         return
 
-    def STORE(self):
+    def STORE(self, rx, dv):
         return
 
-    def ADD(self):
+    def ADD(self, rx, ry, rz):
+        return
+
+    def SUBTRACT(self, rx, ry, rz):
         return
 
 
-def exec_file(file_name: str, f: fCalls):
+def load_file(file_name: str, f: fCalls):
     # Open the file with read perms
     file = open(file_name, "r")
     Lines = file.readlines()
@@ -151,12 +151,23 @@ def exec_file(file_name: str, f: fCalls):
             split_line[val] = split_line[val].replace(",", "")
             split_line[val] = split_line[val].replace("\n", "")
 
+        # Make a list of ops
+        ops = []
+
         # Get function
         match split_line[0]:
             case "MOVE":
-                f.MOVE(int(split_line[1]), int(split_line[2]))
+                # Sanitize
+                rx = split_line[1].replace("R", "")
+
+                # Append to list
+                ops.append([fCalls.MOVE, int(rx), int(split_line[2])])
             case "LOAD":
-                f.LOAD(int(split_line[1]), int(split_line[2]))
+                rx = split_line[1].replace("R", "")
+                split_line[2].replace("R", "")
+                split_line[2].replace("[", "")
+                split_line[2].replace("]", "")
+                ops.append([fCalls.LOAD, int(split_line[1]), int(split_line[2])])
             case "STORE":
                 print("store")
             case "ADD":
@@ -172,7 +183,7 @@ def exec_file(file_name: str, f: fCalls):
                 return False
 
         # Return true on success
-        return True
+        return
 
 
 # Run main
