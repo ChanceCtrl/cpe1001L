@@ -10,11 +10,11 @@ if __name__ == "__main__":
     # Compass, Gyro, Accelerometer
     sh.set_imu_config(False, False, True)
 
+    # Color defs
     R = [255, 0, 0]
     B = [0, 0, 255]
     Y = [255, 255, 0]
     W = [255, 255, 255]
-    N = [0, 0, 0]
 
     while cont:
         acl = sh.get_accelerometer_raw()
@@ -32,5 +32,11 @@ if __name__ == "__main__":
 
         # "sensehat stationary" state
         else:
-            make_logo(sh, N)  # Display NONE
+            sh.clear()  # Display NONE
             sleep(1)
+
+        for event in sh.stick.get_events():
+            if event.action == "held":
+                sleep(1)
+                cont = False
+                break
