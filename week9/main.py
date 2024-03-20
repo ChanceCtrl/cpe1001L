@@ -2,10 +2,11 @@ from time import sleep
 
 import sense_hat
 
-from .helpers import make_logo
+from helpers import make_logo
 
 if __name__ == "__main__":
     cont = True
+    th = 3
     sh = sense_hat.SenseHat()
     # Compass, Gyro, Accelerometer
     sh.set_imu_config(False, False, True)
@@ -20,7 +21,7 @@ if __name__ == "__main__":
         acl = sh.get_accelerometer_raw()
 
         # "sensehat accelerating" state
-        if acl["pitch"] >= 2 or acl["roll"] >= 2 or acl["yaw"] >= 2:
+        if abs(acl["x"]) >= th or abs(acl["y"]) >= th or abs(acl["z"]) >= th:
             make_logo(sh, R)  # Display RED
             sleep(1)
             make_logo(sh, B)  # Display BLUE
@@ -33,10 +34,10 @@ if __name__ == "__main__":
         # "sensehat stationary" state
         else:
             sh.clear()  # Display NONE
-            sleep(1)
 
         for event in sh.stick.get_events():
             if event.action == "held":
+                sh.clear()  # Display NONE
                 sleep(1)
                 cont = False
                 break
