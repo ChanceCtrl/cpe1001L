@@ -15,11 +15,16 @@ if __name__ == "__main__":
     while cont:
         acl = sh.get_accelerometer_raw()
 
+        for event in sh.stick.get_events():
+            if event.action == "held":
+                sh.clear()  # Display NONE
+                sleep(1)
+                cont = False
+
         # "sensehat accelerating" state
         if mode == 1:
             if abs(acl["x"]) >= th or abs(acl["y"]) >= th or abs(acl["z"]) >= th:
                 dis_thing(sh)
-                break
 
             # "sensehat stationary" state
             else:
@@ -29,64 +34,45 @@ if __name__ == "__main__":
             if acl["x"] < -0.236347:
                 if acl["x"] < -4.23925:
                     sh.clear()
-                    break
+
                 if acl["x"] >= -4.23925:
                     dis_thing(sh)
-                    break
-                break
+
             if acl["x"] >= -0.236347:
                 if acl["x"] < 0.40523:
                     if acl["z"] < 0.673576:
                         if acl["z"] < 0.4754:
                             sh.clear()
-                            break
+
                         if acl["z"] >= 0.4754:
                             dis_thing(sh)
-                            break
-                        break
+
                     if acl["z"] >= 0.673576:
                         if acl["z"] < 1.02195:
                             if acl["z"] < 1.01292:
                                 sh.clear()
-                                break
+
                             if acl["z"] >= 1.01292:
                                 if acl["y"] < 0.067985:
                                     sh.clear()
-                                    break
+
                                 if acl["y"] >= 0.067985:
                                     dis_thing(sh)
-                                    break
-                                break
-                            break
+
                         if acl["z"] >= 1.02195:
                             if acl["x"] < -0.0808383:
                                 dis_thing(sh)
-                                break
+
                             if acl["x"] >= -0.0808383:
                                 sh.clear()
-                                break
-                            break
-                        break
-                    break
+
                 if acl["x"] >= 0.40523:
                     if acl["y"] < -1.54229:
                         sh.clear()
-                        break
+
                     if acl["y"] >= -1.54229:
                         if acl["z"] < 0.37677:
                             sh.clear()
-                            break
+
                         if acl["z"] >= 0.37677:
                             dis_thing(sh)
-                            break
-                        break
-                    break
-                break
-            break
-
-        for event in sh.stick.get_events():
-            if event.action == "held":
-                sh.clear()  # Display NONE
-                sleep(1)
-                cont = False
-                break
