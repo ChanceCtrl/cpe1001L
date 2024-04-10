@@ -28,7 +28,7 @@ if __name__ == "__main__":
             joe_split = o[7].split(" ")
             split_joe_split = joe_split[3].split("/")
             print("joe ping: ", split_joe_split[1])
-            sh.show_message((split_joe_split[1], " ms"), 1.0, [0, 255, 100])
+            sh.show_message(split_joe_split[1], 0.08, [0, 255, 100])
 
         # "sensehat stationary" state
         else:
